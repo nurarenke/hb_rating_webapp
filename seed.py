@@ -2,8 +2,8 @@
 
 from sqlalchemy import func
 from model import User
-# from model import Rating
-# from model import Movie
+from model import Rating
+from model import Movie
 
 from model import connect_to_db, db
 from server import app
@@ -43,22 +43,33 @@ def load_movies():
 
     Movie.query.delete()
 
+    logs = []
+
     for row in open('seed_data/u.item'):
         row = row.strip()
-        movie_id, title, released_str, imdb_url = row.split('|')
-        title = re.sub(r'\([^)]*\)', '', title)
+        movie_data = row.split('|')
+        movie_id, title, released_str, _, imdb_url = movie_data[:5]
+
+        if title == 'unknown':
+            logs.append(movie_data)
+            continue
+
+        # TODO: now it removes everything in (), but we need only () with exact 4 digits inside
+        title = re.sub(r'\(\d{4}\)', '', title).strip().decode("latin-1")
 
         if released_str:
             released_at = datetime.strptime(released_str, "%d-%b-%Y")
         else:
             released_at = None
 
-        movies = Movie(movie_id=movie_id,
+        movie = Movie(movie_id=movie_id,
                        title=title,
                        released_at=released_at,
                        imdb_url=imdb_url)
 
-        db.session.add(user)
+        db.session.add(movie)
+
+    print logs
 
     db.session.commit()
 
@@ -72,13 +83,16 @@ def load_ratings():
 
     for row in open('seed_data/u.data'):
         row = row.strip()
-        rating_id, movie_id, user_id, score = row.split('|')
 
-        ratings = Rating(rating_id=rating_id,
-                         movie_id=movie_id
-                         user_id=user_id
-                         score=score)
-        db.session.add(user)
+        # hey! It was unfair to use tab delimeters!
+
+        user_id, movie_id, score, _ = row.split('\t')
+
+        rating = Rating(user_id=user_id,
+                        movie_id=movie_id,
+                        score=score)
+
+        db.session.add(rating)
 
     db.session.commit()
 
