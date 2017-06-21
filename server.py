@@ -48,14 +48,18 @@ def register_process():
     new_user_email = request.form.get('email')
     password = request.form.get('password')
 
+    query = User.query.filter_by(email = new_user_email).first() 
+    print query
+
     # check if user already in DB, if not - add him
-    if User.query.filter_by(email = new_user_email).all() == []:
-         user = User(email=new_user_email,
-                     password=password)
-         db.session.add(user)
-         db.session.commit()
+    if query:
+        flash("Already in DB")
     else:
-        print "Already in DB"
+        user = User(email=new_user_email,
+                     password=password)
+        db.session.add(user)
+        db.session.commit()
+        flash("New user - {} - succesfully created".format(new_user_email))
 
     return redirect("/")
 
@@ -65,6 +69,17 @@ def login_form():
     """Displays the login form"""
 
     return render_template('login_form.html')
+
+@app.route('/users/<user_id>')
+def user_info(user_id):
+    """ Render user info page"""
+
+    user = User.query.filter_by(user_id=user_id).first()
+    user_ratings = user.ratings
+
+    return render_template("user_info.html",
+                            user=user, 
+                            user_ratings=user_ratings)
 
 
 @app.route('/login_user', methods=['GET'])
@@ -81,22 +96,19 @@ def login_user():
     email = request.args.get("email")
     password = request.args.get("password")
 
-    try:
-        user = User.query.filter_by(email=email).one()
-    except Exception:
-        flash("We have a problem with provided data")
-        return redirect("/login")
+    user = User.query.filter_by(email=email).first()
 
-    if user == []:
+    if user:
+        if user.password == password:
+            flash('You were successfully logged in')
+            session["current_user"] = user.user_id
+            return redirect("users/{}".format(user.user_id))
+        else:
+            flash('Wrong credentials. Try again!')
+            return redirect("/login")
+    else:
         flash('Sorry, {}, you are not our user. Shame on you!'.format(email))
         return redirect("/register")
-    elif user.password == password:
-        flash('You were successfully logged in')
-        session["current_user"] = user.user_id
-        return redirect("/")
-    else:
-        flash('Wrong credentials. Try again!')
-        return redirect("/login")
 
 
 @app.route('/logout')
