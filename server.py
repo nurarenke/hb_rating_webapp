@@ -7,7 +7,6 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Rating, Movie
 
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -45,9 +44,11 @@ def register_form():
 def register_process():
     """Register user in DB """
 
+    # since we have a POST request, lookup for arguments in request.form
     new_user_email = request.form.get('email')
     password = request.form.get('password')
 
+    # check if user already in DB, if not - add him
     if User.query.filter_by(email = new_user_email).all() == []:
          user = User(email=new_user_email,
                      password=password)
@@ -57,6 +58,61 @@ def register_process():
         print "Already in DB"
 
     return redirect("/")
+
+
+@app.route('/login', methods=['GET'])
+def login_form():
+    """Displays the login form"""
+
+    return render_template('login_form.html')
+
+
+@app.route('/login_user', methods=['GET'])
+def login_user():
+    """ Logs user in and add his ID in the (flask) session object if it:
+        - exists in database
+        - and password provided matches password in the database
+
+        Otherwise:
+            catches errors, flash messages and redirect to random places
+    """
+
+    # since we have a GET request, lookup for arguments in request.args
+    email = request.args.get("email")
+    password = request.args.get("password")
+
+    try:
+        user = User.query.filter_by(email=email).one()
+    except Exception:
+        flash("We have a problem with provided data")
+        return redirect("/login")
+
+    if user == []:
+        flash('Sorry, {}, you are not our user. Shame on you!'.format(email))
+        return redirect("/register")
+    elif user.password == password:
+        flash('You were successfully logged in')
+        session["current_user"] = user.user_id
+        return redirect("/")
+    else:
+        flash('Wrong credentials. Try again!')
+        return redirect("/login")
+
+
+@app.route('/logout')
+def logout():
+    """Logout user
+
+       remove current_user from flask.session
+       flash success message
+       and redirect to homepage
+    """
+
+    del session["current_user"]
+    flash('You were logged out. See you later!')
+
+    return redirect('/')
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

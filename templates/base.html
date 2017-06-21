@@ -1,12 +1,28 @@
 <!doctype html>
 <html>
 <head>
-  <title>Ratings</title>
+  <title>{% block title %}Title goes here{% endblock %} Ratings</title>
 </head>
 
 <body>
-  Ratings
-  <hr>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if session.get("current_user")%}
+      {{session.get("current_user")}}
+      <form action="/logout">
+        <input type="submit" value="logout">
+      </form>
+  {% else %}
+      <form action="/login">
+        <input type="submit" value="login">
+      </form>  
+  {% endif %}
 
   {% block content %} put your content here {% endblock %}
 
