@@ -43,33 +43,29 @@ def load_movies():
 
     Movie.query.delete()
 
-    logs = []
-
     for row in open('seed_data/u.item'):
         row = row.strip()
         movie_data = row.split('|')
-        movie_id, title, released_str, _, imdb_url = movie_data[:5]
 
-        if title == 'unknown':
-            logs.append(movie_data)
-            continue
+        movie_id, title, released_str, _, imdb_url = movie_data[:5]
 
         # TODO: now it removes everything in (), but we need only () with exact 4 digits inside
         title = re.sub(r'\(\d{4}\)', '', title).strip().decode("latin-1")
 
         if released_str:
             released_at = datetime.strptime(released_str, "%d-%b-%Y")
+            year = released_at.year
         else:
             released_at = None
+            year = None
 
         movie = Movie(movie_id=movie_id,
                        title=title,
                        released_at=released_at,
+                       release_year=year,
                        imdb_url=imdb_url)
 
         db.session.add(movie)
-
-    print logs
 
     db.session.commit()
 

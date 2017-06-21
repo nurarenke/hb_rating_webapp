@@ -39,7 +39,8 @@ class Movie(db.Model):
 
     movie_id =  db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
-    released_at = db.Column(db.DateTime, nullable=False)
+    released_at = db.Column(db.DateTime, nullable=True)
+    release_year = db.Column(db.Integer, nullable=True)
     imdb_url = db.Column(db.String(512), nullable=True)
 
     def __repr__(self):
@@ -55,9 +56,17 @@ class Rating(db.Model):
     __tablename__ = "ratings"
 
     rating_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    movie_id = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.movie_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     score = db.Column(db.Integer, nullable=False)
+
+    # Define relationship to user
+    user = db.relationship("User",backref=db.backref("ratings", 
+                                                order_by=rating_id))
+
+    # Define relationship to movie
+    movie = db.relationship("Movie", backref=db.backref("ratings",
+                                               order_by=rating_id))
 
     def __repr__(self):
         """String representation of an instance """
