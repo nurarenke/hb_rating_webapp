@@ -59,6 +59,12 @@ def rate_movie():
     db.session.add(rating)
     db.session.commit()
 
+    # update score in ratings if movie already rated by user
+    if Rating.query.filter_by(user_id=user_id, movie_id=movie_id).first():
+        
+    # session.query(Clients).filter(Clients.id == client_id_list).update({'status': status})
+    # session.commit()
+
     return redirect('/movies/{}'.format(movie_id))
 
 @app.route('/movies')
