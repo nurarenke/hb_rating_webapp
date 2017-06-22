@@ -65,12 +65,10 @@ def rate_movie():
         rating.score = score
         flash("Rating for movie updated for current user")
     else:
-        rating = Rating(user_id=user_id,
-                            movie_id=movie_id,
-                            score=score)
+        rating = Rating(user_id=user_id, movie_id=movie_id, score=score)
         db.session.add(rating)
         flash("New rating created")
- 
+
     db.session.commit()
 
     return redirect('/movies/{}'.format(movie_id))
@@ -86,12 +84,35 @@ def movie_list():
 def movie_info(movie_id):
     '''Display movie info about one particular movie'''
 
-    movie= Movie.query.filter_by(movie_id=movie_id).first()
-    movie_ratings = movie.ratings
+    movie= Movie.query.get(movie_id)
+
+    user_id = session.get("current_user")
+
+    if user_id:
+        user_rating = Rating.query.filter_by(
+            user_id=user_id, movie_id=movie_id).first()
+    else:
+        user_rating = None
+
+    #Get average rating of movie
+
+    rating_scores = [r.score for r in movie.ratings]
+    avg_rating = float(sum(rating_scores)) / len(rating_scores)
+
+    prediction = None
+
+    # Prediction code: only predict if the user hasn't rated it.
+
+    if (not user_rating) and user_id:
+        user = User.query.get(user_id)
+        if user:
+            prediction = user.predict_rating(movie)
 
     return render_template('movie_info.html',
-                            movie=movie,
-                            movie_ratings=movie_ratings)
+                        movie=movie,
+                        user_rating=user_rating,
+                        average=avg_rating,
+                        prediction=prediction)
 
 
 @app.route("/register", methods=["GET", "POST"])

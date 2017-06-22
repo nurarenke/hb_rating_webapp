@@ -4,12 +4,15 @@ from sqlalchemy import func
 from model import User
 from model import Rating
 from model import Movie
+from faker import Factory
 
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
 import re
 
+
+fake = Factory.create()
 
 def load_users():
     """Load users from u.user into database."""
@@ -25,7 +28,12 @@ def load_users():
         row = row.rstrip()
         user_id, age, gender, occupation, zipcode = row.split("|")
 
+        email = fake.email()
+        password=fake.password()
+
         user = User(user_id=user_id,
+                    email=email,
+                    password=password,
                     age=age,
                     zipcode=zipcode)
 
