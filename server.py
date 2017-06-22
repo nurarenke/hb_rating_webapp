@@ -45,25 +45,33 @@ def user_info(user_id):
                             user_ratings=user_ratings)
 
 
-@app.route('/rate_movie', methods=["POST"])
+@app.route("/rate_movie", methods=["POST"])
 def rate_movie():
     """Record new movie rating or update existing"""
 
     movie_id = request.form.get("movie_id")
     user_id = request.form.get("user_id")
     score = request.form.get("score")
-
-    rating = Rating(user_id=user_id,
-                        movie_id=movie_id,
-                        score=score)
-    db.session.add(rating)
-    db.session.commit()
+    rating = Rating.query.filter_by(user_id=user_id, movie_id=movie_id).first()
 
     # update score in ratings if movie already rated by user
-    if Rating.query.filter_by(user_id=user_id, movie_id=movie_id).first():
-        
-    # session.query(Clients).filter(Clients.id == client_id_list).update({'status': status})
-    # session.commit()
+    if rating:
+        # UPDATE table_name
+        # SET column1 = value1, column2 = value2, ...
+        # WHERE condition;
+
+        # rating.update({'score': score})
+
+        rating.score = score
+        flash("Rating for movie updated for current user")
+    else:
+        rating = Rating(user_id=user_id,
+                            movie_id=movie_id,
+                            score=score)
+        db.session.add(rating)
+        flash("New rating created")
+ 
+    db.session.commit()
 
     return redirect('/movies/{}'.format(movie_id))
 
@@ -86,35 +94,33 @@ def movie_info(movie_id):
                             movie_ratings=movie_ratings)
 
 
-@app.route("/register", methods=["GET"])
-def register_form():
-    """Displays registration form"""
-
-    return render_template("register_form.html")
-
-
-@app.route("/register", methods=["POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register_process():
-    """Register user in DB """
+    """Display registration form and register user in DB"""
 
-    # since we have a POST request, lookup for arguments in request.form
-    new_user_email = request.form.get('email')
-    password = request.form.get('password')
+    if request.method == 'POST':
+        # since we have a POST request, lookup for arguments in request.form
+        new_user_email = request.form.get('email')
+        password = request.form.get('password')
 
-    query = User.query.filter_by(email = new_user_email).first() 
-    print query
+        query = User.query.filter_by(email = new_user_email).first() 
+        print query
 
-    # check if user already in DB, if not - add him
-    if query:
-        flash("Already in DB")
-    else:
-        user = User(email=new_user_email,
-                     password=password)
-        db.session.add(user)
-        db.session.commit()
-        flash("New user - {} - succesfully created".format(new_user_email))
+        # check if user already in DB, if not - add him
+        if query:
+            flash("Already in DB")
+        else:
+            user = User(email=new_user_email,
+                         password=password)
+            db.session.add(user)
+            db.session.commit()
+            flash("New user - {} - succesfully created".format(new_user_email))
 
-    return redirect("/")
+        return redirect("/")
+    elif request.method == "GET":
+        """Displays registration form"""
+
+        return render_template("register_form.html")
 
 
 @app.route('/login', methods=['GET'])
