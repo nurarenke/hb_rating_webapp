@@ -8,9 +8,9 @@
     <p>Age {{user.age}}</p>
     <p>Zipcode {{user.zipcode}}</p>
 
-    {% for rating in user_ratings%}
-      <ul>
+    <ul>
+    {% for rating in user_ratings%}  
         <li> {{rating.movie.title}} - {{rating.score}}</li>
-      </ul> 
     {% endfor %}
+    </ul> 
 {% endblock %}

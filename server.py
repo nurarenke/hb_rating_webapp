@@ -33,6 +33,53 @@ def user_list():
     return render_template("user_list.html", users=users)
 
 
+@app.route('/users/<user_id>')
+def user_info(user_id):
+    """ Render user info page"""
+
+    user = User.query.filter_by(user_id=user_id).first()
+    user_ratings = user.ratings
+
+    return render_template("user_info.html",
+                            user=user, 
+                            user_ratings=user_ratings)
+
+
+@app.route('/rate_movie', methods=["POST"])
+def rate_movie():
+    """Record new movie rating or update existing"""
+
+    movie_id = request.form.get("movie_id")
+    user_id = request.form.get("user_id")
+    score = request.form.get("score")
+
+    rating = Rating(user_id=user_id,
+                        movie_id=movie_id,
+                        score=score)
+    db.session.add(rating)
+    db.session.commit()
+
+    return redirect('/movies/{}'.format(movie_id))
+
+@app.route('/movies')
+def movie_list():
+    '''Show list of movies.'''
+
+    movies = Movie.query.order_by(Movie.title).all()
+    return render_template('movies_list.html', movies=movies)
+
+@app.route('/movies/<movie_id>')
+def movie_info(movie_id):
+    '''Display movie info about one particular movie'''
+
+    movie= Movie.query.filter_by(movie_id=movie_id).first()
+    movie_ratings = movie.ratings
+
+    return render_template('movie_info.html',
+                            movie=movie,
+                            movie_ratings=movie_ratings)
+
+
 @app.route("/register", methods=["GET"])
 def register_form():
     """Displays registration form"""
@@ -69,17 +116,6 @@ def login_form():
     """Displays the login form"""
 
     return render_template('login_form.html')
-
-@app.route('/users/<user_id>')
-def user_info(user_id):
-    """ Render user info page"""
-
-    user = User.query.filter_by(user_id=user_id).first()
-    user_ratings = user.ratings
-
-    return render_template("user_info.html",
-                            user=user, 
-                            user_ratings=user_ratings)
 
 
 @app.route('/login_user', methods=['GET'])
