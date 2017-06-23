@@ -27584,6 +27584,7 @@ COPY ratings (rating_id, movie_id, user_id, score) FROM stdin;
 25719	270	451	4
 25720	362	515	4
 25721	328	327	2
+25722	141	1	3
 25723	519	18	4
 25724	116	500	4
 25725	250	293	3
@@ -101861,13 +101862,6 @@ COPY ratings (rating_id, movie_id, user_id, score) FROM stdin;
 99997	1090	276	1
 99998	225	13	2
 99999	203	12	3
-100000	1	945	1
-100001	1274	945	5
-100002	373	945	5
-100003	314	945	5
-100004	95	945	1
-100005	71	945	1
-25722	141	1	4
 \.
 
 
@@ -101875,7 +101869,7 @@ COPY ratings (rating_id, movie_id, user_id, score) FROM stdin;
 -- Name: ratings_rating_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('ratings_rating_id_seq', 100005, true);
+SELECT pg_catalog.setval('ratings_rating_id_seq', 99999, true);
 
 
 --
@@ -102826,7 +102820,6 @@ COPY users (user_id, email, password, age, zipcode) FROM stdin;
 941	nweber@gmail.com	1&y2Hz442(	20	97229
 942	cgill@henson.biz	WlU^1LdG$)	48	78209
 943	charles68@brown.biz	(_2E9Yyn$q	22	77841
-945	the-eye@of-judgment.com	evil	\N	\N
 \.
 
 
@@ -102834,7 +102827,7 @@ COPY users (user_id, email, password, age, zipcode) FROM stdin;
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('users_user_id_seq', 945, true);
+SELECT pg_catalog.setval('users_user_id_seq', 944, true);
 
 
 --

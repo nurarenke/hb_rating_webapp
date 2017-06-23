@@ -7,11 +7,9 @@
     {{movie.title}}
 
     <p>
-    {% if user_rating%}    
-        {% for rating in user_rating%}  
-            {{rating.score}} 
-        {% endfor %}
-    {% endif %}
+            Your score is: {{user_rating.score}}. 
+
+            <p>{{beratement}}</p>
     </p>
 
     {% if session.get("current_user") %}
@@ -22,7 +20,7 @@
             <input type="submit" value="Submit rating">
         </form>
     
-        <p>Average rating: {{ average }}</p>
+        <p>Average rating from {{ num_of_raters }} user(s): {{ average }}</p>
         {% if prediction %}
             <p>We predict you will rate this movie {{ prediction }}.</p>
         {% endif %}
