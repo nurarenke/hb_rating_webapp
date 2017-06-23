@@ -27,7 +27,6 @@ def load_users():
     for row in open("seed_data/u.user"):
         row = row.rstrip()
         user_id, age, gender, occupation, zipcode = row.split("|")
-
         email = fake.email()
         password=fake.password()
 

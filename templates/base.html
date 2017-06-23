@@ -2,9 +2,13 @@
 <html>
 <head>
   <title>{% block title %}Title goes here{% endblock %} Ratings</title>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+  <link href="static/styles.css" rel="stylesheet">
 </head>
 
 <body>
+ <div class="container">
+
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       {% for message in messages %}
@@ -26,8 +30,11 @@
 
   {% block content %} put your content here {% endblock %}
 
-  <p>
-    <form action="/"> <input type="submit" value="go home!"></form>
-  </p>
+    <div class="col">
+      <form action="/">
+          <input type="submit" value="Home">
+        </form>
+    </div>
+  </div>
 </body>
 </html>
