@@ -110,14 +110,12 @@ def movie_info(movie_id):
             prediction = user.predict_rating(movie)
 
      # Either use the prediction or their real rating
-    if prediction:
-        # User hasn't scored; use our prediction if we made one
-        effective_rating = prediction
-
-    elif user_rating:
+    if user_rating:
         # User has already scored for real; use that
         effective_rating = user_rating.score
-
+    elif prediction:
+        # User hasn't scored; use our prediction if we made one
+        effective_rating = prediction
     else:
         # User hasn't scored, and we couldn't get a prediction
         effective_rating = None
